@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="public/css/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
@@ -13,7 +13,7 @@
 
     <title>Page Title</title>
 </head>
-<body>
+<body style="background-color: rgb(226, 235, 234);">
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <a class="navbar-brand" href="index.php">
@@ -60,7 +60,7 @@
                 if (isset($_SESSION['userId'])) :
                     echo "<img src=".$_SESSION['picture']." style='width:40px; height: 40px; margin-right: 20px;'>"; ?>
                     <form class="form-inline my-2 my-lg-0" action="index.php?action=logout" method="POST">
-                        <button class="btn btn-success my-2 my-sm-0" type="submit" name="logout-submit">Logout</button>
+                        <button class="btn btn-success my-2 my-sm-0" type="submit" name="logout_submit">Logout</button>
                     </form>
                 <?php else : ?>
                     <!-- Sinon on affiche le signup - login -->
@@ -74,10 +74,10 @@
                         }
                         ?>
                         <input class="form-control mr-sm-2" type="password" name="pwd" placeholder="Password">
-                        <button  class="btn btn-success my-2 my-sm-0" type="submit" name="login-submit">Login</button>
+                        <button  class="btn btn-success my-2 my-sm-0" type="submit" name="login_submit">Login</button>
                     </form>
-                    <form class="form-inline ml-3 my-lg-0" action="index.php?action=signup-form" method="POST">
-                        <button class="btn btn-success my-2 my-sm-0" type="submit" name="signup-submit">Signup</button>
+                    <form class="form-inline ml-3 my-lg-0" action="index.php?action=signup_form" method="POST">
+                        <button class="btn btn-success my-2 my-sm-0" type="submit" name="signup_submit">Signup</button>
                     </form>
                 <?php endif ?>
             </div>

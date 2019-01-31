@@ -1,6 +1,7 @@
 <?php
 
 require 'UserModel.php';
+require 'CheckErrors.php';
 
 class Model {
 

@@ -3,21 +3,29 @@
 ob_start();
 
 // Si on est connecté le profil peut s'afficher, sinon on renvoie à l'index
-if (isset($_SESSION['userId'])) {
+if (isset($_SESSION['userId'])) { ?>
+    <!-- On affiche des infos ainsi qu'un formulaire pour changer d'image de profil -->
+    <div class="profile-contender">
+        <?php echo "<img src=".$_SESSION['picture']." class='profile-img'>"; ?>
+        <br>
+        <?php if (isset($_GET['profile-action'])) {
+            if ($_GET['profile-action'] == "avatar") { ?>
+                <form action='index.php?action=upload_picture' method='POST' enctype='multipart/form-data'>
+                    <input type='file' name='uploaded_file'>
+                    <button type='submit' name='uploadimg_submit'>Upload picture</button>
+                </form>
+                <form action='index.php?action=delete_picture' method='POST'>
+                    <button type='submit' name='deleteimg_submit'>Delete picture</button>
+                </form><br>
+        <?php }
+        } else {
+            echo '<a style="margin-left: 175px" href="index.php?action=profile&profile-action=avatar">Change profile picture</a><br>';
+        }
 
-    // On affiche des infos ainsi qu'un formulaire pour changer d'image de profil
-    echo "<img class='XXXXXXX' src=".$_SESSION['picture'].">";
-    echo "ID : ".$id."<br>";
-    echo "Username : ".$_SESSION['userUid']."<br>";
-    echo $_SESSION['userEmail']."<br>";
-    echo $_SESSION['role']."<br>";
-    echo "<form action='index.php?action=upload-picture' method='POST' enctype='multipart/form-data'>
-            <input type='file' name='uploaded-file'>
-        <button type='submit' name='uploadimg-submit'>Upload picture</button>
-        </form>";
-    echo "<form action='index.php?action=delete-picture' method='POST'>
-            <button type='submit' name='deleteimg-submit'>Delete picture</button>
-        </form>";
+    echo "ID : ".$_SESSION['userId']."<br>
+    Username : ".$_SESSION['userUid']."<br>".
+    $_SESSION['userEmail']."<br>".
+    $_SESSION['role']."</div>";
 } else {
     header("Location: index.php");
 }

@@ -50,7 +50,7 @@
         <label for="repwd">Repeat Password :</label>
         <input class="form-control" type="password" id="repwd" name="repwd">
     </div>
-    <button class="btn btn-primary" type="submit" name="signup-submit">Submit</button>
+    <button class="btn btn-primary" type="submit" name="signup_submit">Submit</button>
 </form>
 
 <?php $content = ob_get_clean();

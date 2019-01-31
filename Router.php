@@ -7,19 +7,19 @@ class Router {
     public static function routerDirection() {
 
         if (isset($_GET['action'])) {
-            if ($_GET['action'] == 'signup-form') {
+            if ($_GET['action'] == 'signup_form') {
                 UserController::signupForm();
             } else if ($_GET['action'] == 'signup') {
-                UserController::signup();
+                UserController::signup($_POST['uid'], $_POST['email'], $_POST['pwd'], $_POST['repwd']);
             } else if ($_GET['action'] == 'login') {
                 UserController::login();
             } else if ($_GET['action'] == 'logout') {
                 UserController::logout();
             } else if ($_GET['action'] == 'profile') {
                 UserController::profile();
-            } else if ($_GET['action'] == 'upload-picture') {
+            } else if ($_GET['action'] == 'upload_picture') {
                 UserController::uploadPicture();
-            } else if ($_GET['action'] == 'delete-picture') {
+            } else if ($_GET['action'] == 'delete_picture') {
                 UserController::deletePicture();
             }
         } else {

@@ -2,80 +2,46 @@
 
 class UserModel extends Model {
 
-    public static function signup() {
-        // Pour s'assure que l'user soit sur la page de manière normale
-        if (isset($_POST['signup-submit'])) {
+    public static function signup($username, $email, $password, $passwordRepeat) {
 
-            // On prend les params donnés par l'user
-            $username = $_POST['uid'];
-            $email = $_POST['email'];
-            $password = $_POST['pwd'];
-            $passwordRepeat = $_POST['repwd'];
+        // Si on a rencontré aucun problème, on regarde si un user avec ce nom ou un email n'existent pas déjà
+        $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
+        $stmt->execute([$username, $email]);
 
-            // Si des paramètres sont vides, on renvoie une erreur
-            if (empty($username) || empty($email) || empty($password) || empty($passwordRepeat)) {
-                header("Location: index.php?action=signup-form&error=emptyfields&uid=".$username."&email=".$email);
+        $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($datas != null) {
+            header("Location: index.php?action=signup_form&error=usernameoremailtaken");
+            exit();
+        // Si tout est bon, on peut créer l'user
+        } else {
+            $userRole = 100;
+            $userLevel = 1;
+            $userStrength = 1;
+            $userEcoSkill = 1;
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+            // Dans la DB users
+            $stmt = Model::connect()->prepare("INSERT INTO users (role, email, username, password, level, strength, eco_skill) VALUES (?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$userRole, $email, $username, $hashedPassword, $userLevel, $userStrength, $userEcoSkill]);
+
+            // Dans la DB users_inventory
+            $stmt = Model::connect()->query("INSERT INTO users_inventory (iron, cereals, weapons, food) VALUES (1000, 1000, 100, 100)");
+
+            // Dans la DB users_gallery
+            $stmt = Model::connect()->query("SELECT * FROM users WHERE username='$username'");
+
+            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            if ($datas == null) {
+                header("Location: index.php?action=signup_form&error=cantfinalize");
                 exit();
-            // Si l'email et l'username ne sont pas bons, on renvoie une erreur
-            } else if (!filter_var($email, FILTER_VALIDATE_EMAIL) && !preg_match("/^[a-zA-Z0-9]*$/", $username)) {
-                header("Location: index.php?action=signup-form&error=invalidemailuid");
-                exit();
-            // Si l'email n'est pas bon, on renvoie une erreur
-            } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                header("Location: index.php?action=signup-form&error=invalidemail&uid=".$username);
-                exit();
-            // Si l'username n'est pas bon, on renvoie une erreur
-            } else if (!preg_match("/^[a-zA-Z0-9]*$/", $username)) {
-                header("Location: index.php?action=signup-form&error=invaliduid&email=".$email);
-                exit();
-            // Si le mdp et la répétition de mdp ne correspondent pas, on renvoie une erreur
-            } else if ($password != $passwordRepeat) {
-                header("Location: index.php?action=signup-form&error=password&uid=".$username."&email=".$email);
-                exit();
-            // Si on a rencontré aucun problème, on regarde si un user avec ce nom ou un email n'existent pas déjà
             } else {
-                $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
-                $stmt->execute([$username, $email]);
+                $userid = $datas[0]['id'];
+                $stmt = Model::connect()->query("INSERT INTO users_gallery (id_user, status) VALUES ('$userid', 0)");
 
-                $datas = array();
-                while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    $datas[] = $row;
-                }
-
-                if ($datas != null) {
-                    header("Location: index.php?action=signup-form&error=usernameoremailtaken");
-                    exit();
-                // Si tout est bon, on peut créer l'user
-                } else {
-                    $userRole = 100;
-                    $userLevel = 1;
-                    $userStrength = 1;
-                    $userEcoSkill = 1;
-                    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
-                    // Dans la DB users
-                    $stmt = Model::connect()->prepare("INSERT INTO users (role, email, username, password, level, strength, eco_skill) VALUES (?, ?, ?, ?, ?, ?, ?)");
-                    $stmt->execute([$userRole, $email, $username, $hashedPassword, $userLevel, $userStrength, $userEcoSkill]);
-
-                    // Dans la DB users_inventory
-                    $stmt = Model::connect()->query("INSERT INTO users_inventory (iron, cereals, weapons, food) VALUES (1000, 1000, 100, 100)");
-
-                    // Dans la DB users_gallery
-                    $stmt = Model::connect()->query("SELECT * FROM users WHERE username='$username'");
-
-                    $datas = array();
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        $datas[] = $row;
-                    }
-
-                    if ($datas == null) {
-                        header("Location: index.php?action=signup-form&error=cantfinalize");
-                        exit();
-                    } else {
-                        $userid = $datas[0]['id'];
-                        $stmt = Model::connect()->query("INSERT INTO users_gallery (id_user, status) VALUES ('$userid', 0)");
-                    }
-                }
+                header("Location: index.php?signup=success");
+                exit();
             }
         }
     }
@@ -94,10 +60,7 @@ class UserModel extends Model {
             $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
             $stmt->execute([$mailuid, $mailuid]);
 
-            $datas = array();
-            while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                $datas[] = $row;
-            }
+            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             if ($datas == null) {
                 header("Location: index.php?error=usernotfound");
@@ -148,22 +111,12 @@ class UserModel extends Model {
         header("Location: index.php");
     }
 
-    public static function profile() {
-
-        // Pour des raisons pratiques, on crée une variable $id
-        $id = $_SESSION['userId'];
-        // Recherche sql dans la DB pour savoir si userid correspond à l'id de l'user actuel
-        $stmt = Model::connect()->query("SELECT * FROM users_gallery WHERE id_user='$id'");
-
-        require 'views/profile.php';
-    }
-
     public static function uploadPicture() {
 
         $id = $_SESSION['userId'];
 
-        if(isset($_POST['uploadimg-submit'])) {
-            $file = $_FILES['uploaded-file'];
+        if(isset($_POST['uploadimg_submit'])) {
+            $file = $_FILES['uploaded_file'];
 
             //$fileName = $_FILES['uploaded-files']['name'];
             // OU
