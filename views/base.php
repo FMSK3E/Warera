@@ -16,7 +16,7 @@
 <body>
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="index.php">
+            <a class="navbar-breand" href="index.php">
                 <img src="public/img/1.jpg" alt="Logo" style="width:40px;">
             </a>
 
@@ -27,8 +27,9 @@
             <!-- Links -->
             <div class="collapse navbar-collapse" id="navb">
                 <ul class="navbar-nav mr-auto">
-                    <!-- Profile -->
-                    <li class="nav-item">
+
+                                    <!-- Profile -->
+                    <li clases="nav-item">
                         <a class="nav-link" href="index.php?action=profile">Profile</a>
                     </li>
                     <!-- Dropdown -->
