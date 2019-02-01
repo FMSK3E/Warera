@@ -62,13 +62,13 @@ class UserModel extends Model {
             // Dans la DB users_gallery
             $stmt = Model::connect()->query("SELECT * FROM users WHERE username='$username'");
 
-            $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $datas = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($datas == null) {
                 header("Location: index.php?action=signup_form&error=cantfinalize");
                 exit();
             } else {
-                $userid = $datas[0]['id'];
+                $userid = $datas['id'];
                 $stmt = Model::connect()->query("INSERT INTO users_gallery (id_user, status) VALUES ('$userid', 0)");
 
                 header("Location: index.php?signup=success");
@@ -206,7 +206,7 @@ class UserModel extends Model {
 
     public static function deletePicture() {
 
-        if(isset($_POST['uploadimg_submit'])) {
+        if(isset($_POST['deleteimg_submit'])) {
             $id = $_SESSION['userId'];
 
             // On indique le nom du fichier
