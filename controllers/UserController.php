@@ -29,7 +29,8 @@ class UserController {
         require 'views/index.php';
     }
 
-    public static function profile() {
+    public static function profile($id) {
+        $userInfos = UserModel::findUserInfos($id);
         require 'views/profile.php';
     }
 

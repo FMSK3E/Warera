@@ -16,7 +16,7 @@ class Router {
             } else if ($_GET['action'] == 'logout') {
                 UserController::logout();
             } else if ($_GET['action'] == 'profile') {
-                UserController::profile();
+                UserController::profile($_GET['id']);
             } else if ($_GET['action'] == 'upload_picture') {
                 UserController::uploadPicture();
             } else if ($_GET['action'] == 'delete_picture') {

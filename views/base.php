@@ -28,9 +28,11 @@
             <div class="collapse navbar-collapse" id="navb">
                 <ul class="navbar-nav mr-auto">
                     <!-- Profile -->
-                    <li class="nav-item">
-                        <a class="nav-link" href="index.php?action=profile">Profile</a>
-                    </li>
+                    <?php
+                    if (isset($_SESSION['userId'])) {
+                    echo '<li class="nav-item">
+                        <a class="nav-link" href=index.php?action=profile&id='.$_SESSION['userId'].'>Profile</a>
+                    </li>'; } ?>
                     <!-- Dropdown -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbardrop" data-toggle="dropdown">
@@ -58,7 +60,7 @@
                 <?php
                 // Si on est connecté, on affiche le logout et l'image de profil
                 if (isset($_SESSION['userId'])) :
-                    echo "<img src=".$_SESSION['picture']." style='width:40px; height: 40px; margin-right: 20px;'>"; ?>
+                    echo '<img src='.$_SESSION['picture'].' style="width:40px; height: 40px; margin-right: 20px;">'; ?>
                     <form class="form-inline my-2 my-lg-0" action="index.php?action=logout" method="POST">
                         <button class="btn btn-success my-2 my-sm-0" type="submit" name="logout_submit">Logout</button>
                     </form>
