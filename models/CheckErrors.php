@@ -69,6 +69,7 @@ class CheckErrors extends Model {
         } else if ($newPassword != $newPasswordRepeat) {
             header("Location: index.php?action=profile&id=".$_SESSION['userId']."&profile_action=password&error=password");
             exit();
+        // Si le nouveau et le vieux mdp sont identiques
         } else if ($newPassword == $oldPassword) {
             header("Location: index.php?action=profile&id=".$_SESSION['userId']."&profile_action=password&error=samepassword");
             exit();

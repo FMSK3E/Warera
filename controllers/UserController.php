@@ -7,7 +7,6 @@ class UserController {
     }
 
     public static function signup($username, $email, $password, $passwordRepeat) {
-        // Pour s'assurer que l'user soit sur la page de manière normale
         if (isset($_POST['signup_submit'])) {
             CheckErrors::signupErrors($username, $email, $password, $passwordRepeat);
             UserModel::signup($username, $email, $password);
@@ -53,7 +52,12 @@ class UserController {
     }
 
     public static function changePassword($newPassword, $newPasswordRepeat, $oldPassword) {
-        CheckErrors::changePasswordErrors($newPassword, $newPasswordRepeat, $oldPassword);
-        UserModel::changePassword($newPassword);
+        if(isset($_POST['changepassword_submit'])) {
+            CheckErrors::changePasswordErrors($newPassword, $newPasswordRepeat, $oldPassword);
+            UserModel::changePassword($newPassword);
+        } else {
+            header("Location: index.php");
+            exit();
+        }
     }
 }
