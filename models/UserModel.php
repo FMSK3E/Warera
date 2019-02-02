@@ -33,7 +33,7 @@ class UserModel extends Model {
         }
     }
 
-    public static function signup($username, $email, $password, $passwordRepeat) {
+    public static function signup($username, $email, $password) {
 
         // Si on a rencontré aucun problème, on regarde si un user avec ce nom ou un email n'existent pas déjà
         $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
@@ -82,54 +82,58 @@ class UserModel extends Model {
         // On prend les infos que l'user a donnée
         $mailuid = $_POST['mailuid'];
         $password = $_POST['pwd'];
-
-        if (empty($mailuid) || empty($password)) {
-            header("Location: index.php?error=emptyfields&mailuid=".$mailuid);
-            exit();
-        // Si les params sont remplis, on cherche les infos de la personne correspondant au mail / à l'id
-        } else {
-            $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
-            $stmt->execute([$mailuid, $mailuid]);
-
-            $datas = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if ($datas == null) {
-                header("Location: index.php?error=usernotfound");
+        if(isset($_POST['login_submit'])) {
+            if (empty($mailuid) || empty($password)) {
+                header("Location: index.php?error=emptyfields&mailuid=".$mailuid);
                 exit();
-            // Si on trouve des résultats, on check le password
+            // Si les params sont remplis, on cherche les infos de la personne correspondant au mail / à l'id
             } else {
-                $pwdCheck = password_verify($password, $datas['password']);
-                // Si l'user s'est trompé de mdp, on renvoie une erreur
-                if ($pwdCheck == false) {
-                    header("Location: index.php?error=invalidpassword&mailuid=".$mailuid);
+                $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
+                $stmt->execute([$mailuid, $mailuid]);
+
+                $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($datas == null) {
+                    header("Location: index.php?error=usernotfound");
                     exit();
-                // Si le mdp est correct, on lance la session et on donne comme id/username les params trouvés dans la db
+                // Si on trouve des résultats, on check le password
                 } else {
-                    $_SESSION['userId'] = $datas['id'];
-                    $_SESSION['userUid'] = $datas['username'];
-                    $_SESSION['userEmail'] = $datas['email'];
-                    $_SESSION['role'] = $datas['role'];
+                    $pwdCheck = password_verify($password, $datas['password']);
+                    // Si l'user s'est trompé de mdp, on renvoie une erreur
+                    if ($pwdCheck == false) {
+                        header("Location: index.php?error=invalidpassword&mailuid=".$mailuid);
+                        exit();
+                    // Si le mdp est correct, on lance la session et on donne comme id/username les params trouvés dans la db
+                    } else {
+                        $_SESSION['userId'] = $datas['id'];
+                        $_SESSION['userUid'] = $datas['username'];
+                        $_SESSION['userEmail'] = $datas['email'];
+                        $_SESSION['role'] = $datas['role'];
 
-                    $id = $_SESSION['userId'];
-                    // Recherche sql dans la DB pour savoir si l'user a une photo de profil
-                    $stmt = Model::connect()->query("SELECT * FROM users_gallery WHERE id_user='$id'");
-                    // On fait le while de recherche
-                    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                        // Si on voit que l'user à un id similaire dans la table users_gallery, on insère son image dans $_SESSION
-                        if ($row['status'] == 1) {
-                            $fileName = "public/img/profile/profile".$id."*";
-                            $fileInfo = glob($fileName);
-                            $fileExt = explode('.', $fileInfo[0]);
-                            $fileActualExt = $fileExt[1];
-                            $_SESSION['picture'] = "public/img/profile/profile".$id.".".$fileActualExt;
+                        $id = $_SESSION['userId'];
+                        // Recherche sql dans la DB pour savoir si l'user a une photo de profil
+                        $stmt = Model::connect()->query("SELECT * FROM users_gallery WHERE id_user='$id'");
+                        // On fait le while de recherche
+                        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                            // Si on voit que l'user à un id similaire dans la table users_gallery, on insère son image dans $_SESSION
+                            if ($row['status'] == 1) {
+                                $fileName = "public/img/profile/profile".$id."*";
+                                $fileInfo = glob($fileName);
+                                $fileExt = explode('.', $fileInfo[0]);
+                                $fileActualExt = $fileExt[1];
+                                $_SESSION['picture'] = "public/img/profile/profile".$id.".".$fileActualExt;
 
-                        // Sinon on upload une img par défaut
-                        } else {
-                            $_SESSION['picture'] = "public/img/profile/profiledefault.jpg";
+                            // Sinon on upload une img par défaut
+                            } else {
+                                $_SESSION['picture'] = "public/img/profile/profiledefault.jpg";
+                            }
                         }
                     }
                 }
             }
+        } else {
+            header("Location: index.php");
+            exit();
         }
     }
 
@@ -149,13 +153,10 @@ class UserModel extends Model {
         if(isset($_POST['uploadimg_submit'])) {
             $file = $_FILES['uploaded_file'];
 
-            //$fileName = $_FILES['uploaded-files']['name'];
-            // OU
             $fileName = $file['name'];
             $fileTmpName = $file['tmp_name'];
             $fileSize = $file['size'];
             $fileError = $file['error'];
-            // Il y a name - tmp_name - size - error - type
 
             // On explose ce qu'il y a avant le "." (en comptant le "."), il ne reste que l'extension
             $fileExt = explode('.', $fileName);
@@ -176,9 +177,7 @@ class UserModel extends Model {
                         header("Location: index.php?action=profile&id=".$id."&error=toobig");
                         exit();
                     } else {
-                        // On peut créer un id aléatoire "XXXXXX.XXXX.extensionfichier"
-                        //$fileNameNew = uniqid('', true).".".$fileActualExt;
-                        // Ou on peut créer un id perso pour les utilisateurs
+                        // On créer un id perso pour les utilisateurs
                         $fileNameNew = "profile".$id.".".$fileActualExt;
                         // On choisit la destination avec le nouveau nom
                         $fileDest = 'public/img/profile/'.$fileNameNew;
@@ -201,6 +200,7 @@ class UserModel extends Model {
             }
         } else {
             header("Location: index.php");
+            exit();
         }
     }
 
@@ -230,8 +230,30 @@ class UserModel extends Model {
             $_SESSION['picture'] = "public/img/profile/profiledefault.jpg";
 
             header("Location: index.php?action=profile&id=".$id."&delete=success");
+            exit();
         } else {
             header("Location: index.php");
+            exit();
         }
+    }
+
+    public static function changeUsername($newusername) {
+        $id = $_SESSION['userId'];
+        $stmt = Model::connect()->prepare("UPDATE users SET username=? WHERE id='$id';");
+        $stmt->execute([$newusername]);
+
+        header("Location: index.php?action=profile&id=".$_SESSION['userId']."&username=success");
+        exit();
+    }
+
+    public static function changePassword($newPassword) {
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        $id = $_SESSION['userId'];
+        $stmt = Model::connect()->prepare("UPDATE users SET password=? WHERE id='$id';");
+        $stmt->execute([$hashedPassword]);
+
+        header("Location: index.php?action=profile&id=".$_SESSION['userId']."&password=success");
+        exit();
     }
 }

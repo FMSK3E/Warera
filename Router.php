@@ -21,6 +21,10 @@ class Router {
                 UserController::uploadPicture();
             } else if ($_GET['action'] == 'delete_picture') {
                 UserController::deletePicture();
+            } else if ($_GET['action'] == 'change_username') {
+                UserController::changeUsername($_POST['new_username'], $_POST['password']);
+            } else if ($_GET['action'] == 'change_password') {
+                UserController::changePassword($_POST['new_password'], $_POST['new_repassword'], $_POST['password']);
             }
         } else {
             UserController::index();

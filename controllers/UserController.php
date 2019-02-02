@@ -7,10 +7,10 @@ class UserController {
     }
 
     public static function signup($username, $email, $password, $passwordRepeat) {
-        // Pour s'assure que l'user soit sur la page de manière normale
+        // Pour s'assurer que l'user soit sur la page de manière normale
         if (isset($_POST['signup_submit'])) {
             CheckErrors::signupErrors($username, $email, $password, $passwordRepeat);
-            UserModel::signup($username, $email, $password, $passwordRepeat);
+            UserModel::signup($username, $email, $password);
         } else {
             require 'views/index.php';
         }
@@ -40,5 +40,20 @@ class UserController {
 
     public static function deletePicture() {
         UserModel::deletePicture();
+    }
+
+    public static function changeUsername($newusername, $password) {
+        if(isset($_POST['changeusername_submit'])) {
+            CheckErrors::changeUsernameErrors($newusername, $password);
+            UserModel::changeUsername($newusername);
+        } else {
+            header("Location: index.php");
+            exit();
+        }
+    }
+
+    public static function changePassword($newPassword, $newPasswordRepeat, $oldPassword) {
+        CheckErrors::changePasswordErrors($newPassword, $newPasswordRepeat, $oldPassword);
+        UserModel::changePassword($newPassword);
     }
 }
