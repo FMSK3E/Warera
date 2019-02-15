@@ -3,13 +3,14 @@
 class UserController {
 
     public static function signupForm() {
+        $countries = XModel::getNationalities();
         require 'views/signup.php';
     }
 
-    public static function signup($username, $email, $password, $passwordRepeat) {
+    public static function signup($username, $email, $password, $passwordRepeat, $nationality) {
         if (isset($_POST['signup_submit'])) {
-            CheckErrors::signupErrors($username, $email, $password, $passwordRepeat);
-            UserModel::signup($username, $email, $password);
+            CheckErrors::signupErrors($username, $email, $password, $passwordRepeat, $nationality);
+            UserModel::signup($username, $email, $password, $nationality);
         } else {
             require 'views/index.php';
         }
@@ -59,5 +60,9 @@ class UserController {
             header("Location: index.php");
             exit();
         }
+    }
+
+    public static function productMarket() {
+        MarketModel::productMarket();
     }
 }

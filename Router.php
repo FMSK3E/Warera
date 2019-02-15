@@ -1,6 +1,7 @@
 <?php
 
 require_once "controllers/UserController.php";
+require_once "controllers/MarketController.php";
 
 class Router {
 
@@ -10,7 +11,7 @@ class Router {
             if ($_GET['action'] == 'signup_form') {
                 UserController::signupForm();
             } else if ($_GET['action'] == 'signup') {
-                UserController::signup($_POST['uid'], $_POST['email'], $_POST['pwd'], $_POST['repwd']);
+                UserController::signup($_POST['uid'], $_POST['email'], $_POST['pwd'], $_POST['repwd'], $_POST['nationality']);
             } else if ($_GET['action'] == 'login') {
                 UserController::login();
             } else if ($_GET['action'] == 'logout') {
@@ -25,6 +26,8 @@ class Router {
                 UserController::changeUsername($_POST['new_username'], $_POST['password']);
             } else if ($_GET['action'] == 'change_password') {
                 UserController::changePassword($_POST['new_password'], $_POST['new_repassword'], $_POST['password']);
+            }  else if ($_GET['action'] == 'product_market') {
+                MarketController::productMarket();
             }
         } else {
             UserController::index();

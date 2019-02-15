@@ -1,6 +1,8 @@
 <?php
 
 require 'UserModel.php';
+require 'MarketModel.php';
+require 'XModel.php';
 require 'CheckErrors.php';
 
 class Model {
@@ -32,23 +34,54 @@ class Model {
             email VARCHAR(255) NOT NULL,
             username VARCHAR(255) NOT NULL,
             password VARCHAR(255) NOT NULL,
-            level INT(11) NOT NULL,
-            strength INT(11) NOT NULL,
-            eco_skill INT(11) NOT NULL)'
+            level INT(11) NOT NULL DEFAULT 1,
+            strength INT(11) NOT NULL DEFAULT 1,
+            eco_skill INT(11) NOT NULL DEFAULT 1,
+            nationality VARCHAR(255) NOT NULL)'
         );
 
         self::connect()->query('CREATE TABLE IF NOT EXISTS users_inventory (
             id_user INT(11) AUTO_INCREMENT PRIMARY KEY,
-            iron INT(11) NOT NULL,
-            cereals INT(11) NOT NULL,
-            weapons INT(11) NOT NULL,
-            food INT(11) NOT NULL)'
+            iron INT(11) NOT NULL DEFAULT 1000,
+            cereals INT(11) NOT NULL DEFAULT 1000,
+            weapons INT(11) NOT NULL DEFAULT 100,
+            food INT(11) NOT NULL DEFAULT 100)'
+        );
+
+        self::connect()->query('CREATE TABLE IF NOT EXISTS users_wallet (
+            id_user INT(11) AUTO_INCREMENT PRIMARY KEY,
+            alg INT(11) NOT NULL DEFAULT 0,
+            zim INT(11) NOT NULL DEFAULT 0)'
         );
 
         self::connect()->query('CREATE TABLE IF NOT EXISTS users_gallery (
             id INT(11) AUTO_INCREMENT PRIMARY KEY,
             id_user INT(11),
-            status INT(11) NOT NULL)'
+            status INT(11) NOT NULL DEFAULT 0)'
         );
+
+        self::connect()->query('CREATE TABLE IF NOT EXISTS product_market (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            id_seller INT(11),
+            product VARCHAR(255) NOT NULL,
+            stock VARCHAR(255) NOT NULL,
+            price INT(11) NOT NULL,
+            country_market VARCHAR(255) NOT NULL,
+            currency_used VARCHAR(255) NOT NULL)'
+        );
+
+        self::connect()->query('CREATE TABLE IF NOT EXISTS countries (
+            id INT(11) AUTO_INCREMENT PRIMARY KEY,
+            country VARCHAR(255) NOT NULL,
+            currency VARCHAR(255) NOT NULL)'
+        );
+
+        /*self::connect()->query('INSERT INTO countries (country, currency) VALUES
+            ("Zimbabwe", "ZIM"),
+            ("Algeria", "ALG")
+            WHERE (
+            SELECT * FROM countries
+            WHERE id=1)'
+        );*/
     }
 }

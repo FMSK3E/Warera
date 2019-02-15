@@ -39,7 +39,7 @@
                             zzz
                         </a>
                         <div class="dropdown-menu bg-dark">
-                            <a class="dropdown-item bg-dark text-white" href="#">Link 1</a>
+                            <a class="dropdown-item bg-dark text-white" href="#">zbeb 1</a>
                             <a class="dropdown-item bg-dark text-white" href="#">Link 2</a>
                             <a class="dropdown-item bg-dark text-white" href="#">Link 3</a>
                         </div>
@@ -51,7 +51,7 @@
                         </a>
                         <div class="dropdown-menu bg-dark">
                             <a class="dropdown-item bg-dark text-white" href="#">Job Market</a>
-                            <a class="dropdown-item bg-dark text-white" href="#">Product Market</a>
+                            <a class="dropdown-item bg-dark text-white" href="index.php?action=product_market">Product Market</a>
                             <a class="dropdown-item bg-dark text-white" href="#">Monetary Market</a>
                         </div>
                     </li>

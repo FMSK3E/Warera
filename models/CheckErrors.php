@@ -2,26 +2,26 @@
 
 class CheckErrors extends Model {
 
-    public static function signupErrors($username, $email, $password, $passwordRepeat) {
+    public static function signupErrors($username, $email, $password, $passwordRepeat, $nationality) {
         // Si des champs sont vides
-        if (empty($username) || empty($email) || empty($password) || empty($passwordRepeat)) {
-            header("Location: index.php?action=signup_form&error=emptyfields&uid=".$username."&email=".$email);
+        if (empty($username) || empty($email) || empty($password) || empty($passwordRepeat) || empty($nationality)) {
+            header("Location: index.php?action=signup_form&error=emptyfields&uid=".$username."&email=".$email."&nationality=".$nationality);
             exit();
         // Si l'email et l'username ne sont pas bons
         } else if (!filter_var($email, FILTER_VALIDATE_EMAIL) && !preg_match("/^[a-zA-Z0-9]*$/", $username)) {
-            header("Location: index.php?action=signup_form&error=invalidemailuid");
+            header("Location: index.php?action=signup_form&error=invalidemailuid&nationality=".$nationality);
             exit();
         // Si l'email n'est pas bon
         } else if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            header("Location: index.php?action=signup_form&error=invalidemail&uid=".$username);
+            header("Location: index.php?action=signup_form&error=invalidemail&uid=".$username."&nationality=".$nationality);
             exit();
         // Si l'username n'est pas bon
         } else if (!preg_match("/^[a-zA-Z0-9]*$/", $username)) {
-            header("Location: index.php?action=signup_form&error=invaliduid&email=".$email);
+            header("Location: index.php?action=signup_form&error=invaliduid&email=".$email."&nationality=".$nationality);
             exit();
         // Si le mdp et la répétition de mdp ne correspondent pas
         } else if ($password != $passwordRepeat) {
-            header("Location: index.php?action=signup_form&error=password&uid=".$username."&email=".$email);
+            header("Location: index.php?action=signup_form&error=password&uid=".$username."&email=".$email."&nationality=".$nationality);
             exit();
         }
     }

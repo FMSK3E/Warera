@@ -57,11 +57,19 @@ if (isset($_SESSION['userId'])) { ?>
         }
 
     echo 'ID : '.$userInfos['id'].'<br>
-    Username : '.$userInfos['username'].'<br>'.
+    Username : '.$userInfos['username'].'<br>
+    Nationality : '.$userInfos['nationality'].'<br>'.
     $userInfos['email'].'<br>'.
-    $userInfos['role'].'</div>';
+    $userInfos['role'].'<br><br>';
+    if ($_SESSION['userId'] == $userInfos['id']) {
+        foreach ($_SESSION['inventory'] as $product) {
+            if ($product['amount'] > 0)
+                echo ucfirst($product['name']).' : '.$product['amount'].'<br>';
+        }
+    }
+    echo '</div>';
 } else {
-    //header("Location: index.php");
+    header("Location: index.php");
     exit();
 }
 

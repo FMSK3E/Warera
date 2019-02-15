@@ -33,7 +33,7 @@ class UserModel extends Model {
         }
     }
 
-    public static function signup($username, $email, $password) {
+    public static function signup($username, $email, $password, $nationality) {
 
         // Si on a rencontré aucun problème, on regarde si un user avec ce nom ou un email n'existent pas déjà
         $stmt = Model::connect()->prepare("SELECT * FROM users WHERE username=? OR email=?;");
@@ -42,7 +42,7 @@ class UserModel extends Model {
         $datas = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         if ($datas != null) {
-            header("Location: index.php?action=signup_form&error=usernameoremailtaken");
+            header("Location: index.php?action=signup_form&error=usernameoremailtaken&nationality=".$nationality);
             exit();
         // Si tout est bon, on peut créer l'user
         } else {
@@ -53,11 +53,22 @@ class UserModel extends Model {
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
             // Dans la DB users
-            $stmt = Model::connect()->prepare("INSERT INTO users (role, email, username, password, level, strength, eco_skill) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$userRole, $email, $username, $hashedPassword, $userLevel, $userStrength, $userEcoSkill]);
+            $stmt = Model::connect()->prepare("INSERT INTO users (role, email, username, password, nationality) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$userRole, $email, $username, $hashedPassword, $nationality]);
 
             // Dans la DB users_inventory
-            $stmt = Model::connect()->query("INSERT INTO users_inventory (iron, cereals, weapons, food) VALUES (1000, 1000, 100, 100)");
+            $stmt = Model::connect()->query("INSERT INTO users_inventory () VALUES ()");
+
+            // Dans la DB users_wallet
+            $stmt = Model::connect()->prepare("SELECT currency FROM countries WHERE country=?");
+            $stmt->execute([$nationality]);
+            $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+            // Pour transformer le tableau qui contient la devise en string
+            $currency = implode($datas);
+            $currency = strtolower($currency);
+            var_dump($currency);
+
+            $stmt = Model::connect()->query("INSERT INTO users_wallet (".$currency.") VALUES (50)");
 
             // Dans la DB users_gallery
             $stmt = Model::connect()->query("SELECT * FROM users WHERE username='$username'");
@@ -69,7 +80,7 @@ class UserModel extends Model {
                 exit();
             } else {
                 $userid = $datas['id'];
-                $stmt = Model::connect()->query("INSERT INTO users_gallery (id_user, status) VALUES ('$userid', 0)");
+                $stmt = Model::connect()->query("INSERT INTO users_gallery (id_user) VALUES ('$userid')");
 
                 header("Location: index.php?signup=success");
                 exit();
@@ -103,15 +114,19 @@ class UserModel extends Model {
                     if ($pwdCheck == false) {
                         header("Location: index.php?error=invalidpassword&mailuid=".$mailuid);
                         exit();
-                    // Si le mdp est correct, on lance la session et on donne comme id/username les params trouvés dans la db
+                    // Si le mdp est correct, on lance la session et on donne à l'utilisateur les params trouvés dans la db
                     } else {
                         $_SESSION['userId'] = $datas['id'];
                         $_SESSION['userUid'] = $datas['username'];
                         $_SESSION['userEmail'] = $datas['email'];
                         $_SESSION['role'] = $datas['role'];
+                        $_SESSION['level'] = $datas['level'];
+                        $_SESSION['strength'] = $datas['strength'];
+                        $_SESSION['eco_skill'] = $datas['eco_skill'];
+                        $_SESSION['nationality'] = $datas['nationality'];
 
-                        $id = $_SESSION['userId'];
                         // Recherche sql dans la DB pour savoir si l'user a une photo de profil
+                        $id = $_SESSION['userId'];
                         $stmt = Model::connect()->query("SELECT * FROM users_gallery WHERE id_user='$id'");
                         // On fait le while de recherche
                         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
@@ -127,6 +142,23 @@ class UserModel extends Model {
                             } else {
                                 $_SESSION['picture'] = "public/img/profile/profiledefault.jpg";
                             }
+                        }
+
+                        // Recherche sql dans la DB pour récupérer l'inventaire du joueur
+                        $stmt = Model::connect()->query("SELECT * FROM users_inventory WHERE id_user='$id'");
+                        // On fait le while de recherche
+                        $datas = $stmt->fetch(PDO::FETCH_ASSOC);
+                        // Si on voit que l'user à un id similaire dans la table users_iventory, on récupères les données
+                        if ($datas != null) {
+                            // On retire la colonne id_user qu'on avait récupérer avec le reste de l'inventaire
+                            unset($datas['id_user']);
+                            // On assigne l'inventaire sur un tableau de $_SESSION
+                            foreach ($datas as $key => $value) {
+                                $_SESSION['inventory'][$key] = array("name" => $key, 'amount' => $value);
+                            }
+                        } else {
+                            header("Location: index.php?bigerror=inventorynotfound");
+                            exit();
                         }
                     }
                 }
